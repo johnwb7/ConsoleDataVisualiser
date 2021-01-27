@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleDataVisualiser", "ConsoleDataVisualiser.csproj", "{F90A196E-6B2C-4C9E-B57D-C76FD9E29E2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleDataVisualiser", "ConsoleDataVisualiser\ConsoleDataVisualiser.csproj", "{F90A196E-6B2C-4C9E-B57D-C76FD9E29E2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleDataVisualiserUser", "..\ConsoleDataVisualiserUser\ConsoleDataVisualiserUser.csproj", "{8AC85153-273C-4767-AA04-C5D84814289B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleDataVisualiserUser", "ConsoleDataVisualiserUser\ConsoleDataVisualiserUser.csproj", "{8AC85153-273C-4767-AA04-C5D84814289B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

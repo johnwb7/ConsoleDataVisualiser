@@ -9,7 +9,7 @@ namespace ConsoleDataVisualiser.Table
         internal bool DisplayRowNumbers { get; set; } = false;
         internal bool DisplayColumnBorders { get; set; } = false;
         internal bool DisplayHeaderDivider { get; set; } = false;
-        internal int HeaderSpacing { get; set; } = 2;
+        internal int ColumnSpacing { get; set; } = 2;
         public static TableConfiguration Default => new TableConfiguration();
 
         public TableConfiguration()
@@ -40,9 +40,9 @@ namespace ConsoleDataVisualiser.Table
             return this;
         }
 
-        public TableConfiguration WithHeaderSpacing(int headerSpacing)
+        public TableConfiguration WithColumnSpacing(int columnSpacing)
         {
-            HeaderSpacing = headerSpacing;
+            ColumnSpacing = columnSpacing;
             return this;
         }
     }

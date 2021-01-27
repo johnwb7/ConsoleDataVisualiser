@@ -8,11 +8,11 @@ namespace ConsoleDataVisualiserUser
     {
         static void Main(string[] args)
         {
-            var headers = new string[] { "Col 1", "Col 2", "Col 3" };
-            var data = new List<object[]>(){ new object[] { 1, 2, 3 } };
+            var headers = new string[] { "Col 1", "Col 2", "Column 3" };
+            var data = new List<int[]>(){ new int[] { 1, 23, 3 }, new int[] { 4, 5, 6 }, new int[] { 7, 8, 9 } };
             var config = TableConfiguration.Create()
                             .WithHeaderDivider(true)
-                            .WithHeaderSpacing(5);
+                            .WithColumnSpacing(5);
 
             ConsoleTable.Create()
                 .WithHeaders(headers)
