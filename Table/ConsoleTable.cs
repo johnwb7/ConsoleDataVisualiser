@@ -1,46 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ConsoleDataVisualiser.Table
 {
-    public class ConsoleTable<T> where T : struct
+    public class ConsoleTable
     {
         public string[] Headers { get; private set; }
-        public List<T[]> Data {get; private set; }
+        public List<string[]> Data {get; private set; }
         
         private TableConfiguration _configuration { get; set; }
 
-        public static ConsoleTable<T> NewConsoleTable()
+        public static ConsoleTable Create()
         {
-            return new ConsoleTable<T>();
+            return new ConsoleTable();
         }
         private ConsoleTable()
         {
             Headers = new string[0];
-            Data = new List<T[]>();
+            Data = new List<string[]>();
+            _configuration = TableConfiguration.Default;
         }
 
-        public ConsoleTable<T> WithHeaders(string[] headers)
+        public ConsoleTable WithHeaders(string[] headers)
         {
             Headers = headers;
             return this;
         }
 
-        public ConsoleTable<T> WithData(List<T[]> data)
+        public ConsoleTable WithData(List<string[]> data)
         {
             Data = data;
             return this;
         }
 
-        public ConsoleTable<T> WithConfiguration(TableConfiguration config)
+        public ConsoleTable WithData(List<IRowConvertable[]> data)
         {
-            _configuration = config;
+            
+        }
+
+        public ConsoleTable WithData<T>(List<T[]> data)
+        {
+
+        }
+
+        public ConsoleTable AddDataRow(string[] row)
+        {
+            Data.Add(row);
             return this;
         }
 
-        public ConsoleTable<T> AddDataRow(T[] row)
+        public ConsoleTable AddDataRow(IRowConvertable obj)
         {
-            Data.Add(row);
+            Data.Add(obj.MapToRow());
+            return this;
+        }
+
+        public ConsoleTable AddDataRow<T>(T[] row)
+        {
+            Data.Add(row.Select(x => x.ToString()).ToArray());
+            return this;
+        }
+
+        public ConsoleTable WithConfiguration(TableConfiguration config)
+        {
+            _configuration = config;
             return this;
         }
 
