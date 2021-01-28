@@ -27,6 +27,11 @@ namespace ConsoleDataVisualiser.Table
 
         public ConsoleTable WithHeaders(string[] headers)
         {
+            if(Headers.Length > 0)
+            {
+                throw new Exception("Headers already set. Cannot set headers more than once.");
+            }
+
             _headerTotalLength = headers.Sum(x => x.Length);
             UpdateColumnWidthValues(headers);
 
@@ -36,22 +41,22 @@ namespace ConsoleDataVisualiser.Table
 
         public ConsoleTable WithData(List<string[]> data)
         {
-            
-            
+            UpdateColumnWidthValues(data);
             Data = data;
             return this;
         }
 
         public ConsoleTable WithData(IRowConvertable[] data)
         {
-            Data = data.Select(obj => obj.MapToRow().ToArray()).ToList();
+            var formattedData = data.Select(obj => obj.MapToRow().ToArray()).ToList();
+            UpdateColumnWidthValues(formattedData);
             return this;
         }
 
         public ConsoleTable WithData<T>(IEnumerable<T[]> data)
         {
             var formattedData = data.Select(row => row.Select(item => item.ToString()).ToArray()).ToList();
-
+            UpdateColumnWidthValues(formattedData);
             Data = formattedData;
             return this;
         }
@@ -110,8 +115,7 @@ namespace ConsoleDataVisualiser.Table
                 var lengthOfDivider = _headerTotalLength + (_configuration.ColumnSpacing * Headers.Length) + _configuration.ColumnSpacing;
                 var divider = String.Concat(Enumerable.Repeat("-", lengthOfDivider));
                 Console.WriteLine(divider);
-            }
-           
+            }     
         }
 
         private void PrintData()
@@ -136,7 +140,7 @@ namespace ConsoleDataVisualiser.Table
         private (string, string) CreateRequiredFillSpacing(int columnIndex, string data)
         {
             var leftoverSpace = _requiredColumnWidths[columnIndex] - data.Length;
-            var numberOfSpaces = Math.Round((double)(leftoverSpace / 2), MidpointRounding.AwayFromZero);
+            var numberOfSpaces = Math.Ceiling((double)leftoverSpace / 2);
 
             var beforeSpace = String.Concat(Enumerable.Repeat(" ", (int)numberOfSpaces));
             var afterSpace = String.Concat(Enumerable.Repeat(" ", leftoverSpace % 2 == 0 ? (int)numberOfSpaces : (int)numberOfSpaces - 1));
@@ -150,7 +154,7 @@ namespace ConsoleDataVisualiser.Table
             {
                 if(_requiredColumnWidths.ContainsKey(x))
                 {
-                    if (data[x].Length < _requiredColumnWidths[x])
+                    if (data[x].Length > _requiredColumnWidths[x])
                     {
                         _requiredColumnWidths[x] = data[x].Length;
                     }
@@ -158,9 +162,15 @@ namespace ConsoleDataVisualiser.Table
                 else
                 {
                     _requiredColumnWidths[x] = data[x].Length;
-                }
+                }        
+            }
+        }
 
-                
+        private void UpdateColumnWidthValues(List<string[]> data)
+        {
+            foreach(var row in data)
+            {
+                UpdateColumnWidthValues(row);
             }
         }
 
