@@ -8,8 +8,11 @@ namespace ConsoleDataVisualiser.Table
     {
         internal bool DisplayRowNumbers { get; set; } = false;
         internal bool DisplayColumnBorders { get; set; } = false;
-        internal bool DisplayHeaderDivider { get; set; } = false;
+        internal bool DisplayHeaderDivider { get; set; } = true;
         internal int ColumnSpacing { get; set; } = 2;
+
+        internal char HeaderDividerChar = '-';
+        internal char ColumnDividerChar = '|';
         public static TableConfiguration Default => new TableConfiguration();
 
         public TableConfiguration()
@@ -28,14 +31,16 @@ namespace ConsoleDataVisualiser.Table
             return this;
         }
 
-        public TableConfiguration WithColumnBorders(bool displayColumnBorders)
+        public TableConfiguration WithColumnBorders(bool displayColumnBorders, char dividerSymbol = '|')
         {
+            ColumnDividerChar = dividerSymbol;
             DisplayColumnBorders = displayColumnBorders;
             return this;
         }
 
-        public TableConfiguration WithHeaderDivider(bool displayHeaderDivider)
+        public TableConfiguration WithHeaderDivider(bool displayHeaderDivider, char dividerSymbol = '-')
         {
+            HeaderDividerChar = dividerSymbol;
             DisplayHeaderDivider = displayHeaderDivider;
             return this;
         }

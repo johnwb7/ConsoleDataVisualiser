@@ -12,6 +12,8 @@ namespace ConsoleDataVisualiserUser
             var data = new List<int[]>(){ new int[] { 1, 2387768, 3 }, new int[] { 4, 5, 6 }, new int[] { 7, 8, 9 } };
             var config = TableConfiguration.Create()
                             .WithHeaderDivider(true)
+                            .WithColumnBorders(true)
+                            .WithRowNumbers(true)
                             .WithColumnSpacing(5);
 
             ConsoleTable.Create()

@@ -10,6 +10,7 @@ namespace ConsoleDataVisualiser.Table
         public List<string[]> Data {get; private set; }
 
         private int _headerTotalLength { get; set; }
+        private int _numberOfRows { get; set; } = 0;
         private Dictionary<int, int> _requiredColumnWidths { get; set; }
         private TableConfiguration _configuration { get; set; }
 
@@ -42,6 +43,7 @@ namespace ConsoleDataVisualiser.Table
         public ConsoleTable WithData(List<string[]> data)
         {
             UpdateColumnWidthValues(data);
+            _numberOfRows += data.Count;
             Data = data;
             return this;
         }
@@ -50,6 +52,7 @@ namespace ConsoleDataVisualiser.Table
         {
             var formattedData = data.Select(obj => obj.MapToRow().ToArray()).ToList();
             UpdateColumnWidthValues(formattedData);
+            _numberOfRows += data.Length;
             return this;
         }
 
@@ -57,6 +60,7 @@ namespace ConsoleDataVisualiser.Table
         {
             var formattedData = data.Select(row => row.Select(item => item.ToString()).ToArray()).ToList();
             UpdateColumnWidthValues(formattedData);
+            _numberOfRows += formattedData.Count;
             Data = formattedData;
             return this;
         }
@@ -64,7 +68,7 @@ namespace ConsoleDataVisualiser.Table
         public ConsoleTable AddDataRow(string[] row)
         {
             UpdateColumnWidthValues(row);
-
+            _numberOfRows += 1;
             Data.Add(row);
             return this;
         }
@@ -73,6 +77,7 @@ namespace ConsoleDataVisualiser.Table
         {
             var row = obj.MapToRow();
             UpdateColumnWidthValues(row);
+            _numberOfRows += 1;
             Data.Add(row);
             return this;
         }
@@ -81,7 +86,7 @@ namespace ConsoleDataVisualiser.Table
         {
             var formattedData = row.Select(x => x.ToString()).ToArray();
             UpdateColumnWidthValues(formattedData);
-
+            _numberOfRows += 1;
             Data.Add(formattedData);
             return this;
         }
@@ -100,41 +105,56 @@ namespace ConsoleDataVisualiser.Table
 
         private void PrintHeaders()
         {
-            var columnSpacing = CreateColumnSpacing();
-            
-            for(var x = 0; x < Headers.Length; x++)
+            Console.Write(CreateRowNumberBuffer());
+            for (var x = 0; x < Headers.Length; x++)
             {
-                var (beforeSpace, afterSpace) = CreateRequiredFillSpacing(x, Headers[x]);
-                Console.Write($"{columnSpacing}{beforeSpace}{Headers[x]}{afterSpace}");
+                Console.Write(CreateItemForDisplay(x, Headers[x], x == Headers.Length - 1));
             }
-            Console.Write(columnSpacing);
             Console.WriteLine();
 
             if (_configuration.DisplayHeaderDivider)
             {
-                var lengthOfDivider = _headerTotalLength + (_configuration.ColumnSpacing * Headers.Length) + _configuration.ColumnSpacing;
-                var divider = String.Concat(Enumerable.Repeat("-", lengthOfDivider));
-                Console.WriteLine(divider);
+                Console.WriteLine(CreateHeaderDivider());
             }     
         }
 
         private void PrintData()
         {
-            var columnSpacing = CreateColumnSpacing();
-            foreach(var row in Data)
+            for(var y = 0; y < Data.Count; y++)
             {
-                for(var x = 0; x < row.Length; x++)
+                var row = Data[y];
+                var displayRowNumber = _configuration.DisplayRowNumbers ? (y + 1).ToString() : "";
+                Console.Write(displayRowNumber);
+                for (var x = 0; x < row.Length; x++)
                 {
-                    var (beforeSpace, afterSpace) = CreateRequiredFillSpacing(x, row[x]);
-                    Console.Write($"{columnSpacing}{beforeSpace}{row[x]}{afterSpace}");
+                    Console.Write(CreateItemForDisplay(x, row[x], x == row.Length - 1));
                 }
                 Console.WriteLine();
             }
         }
 
+        private string CreateItemForDisplay(int columnIndex, string data, bool isLastValue)
+        {
+
+            var columnSpacing = CreateColumnSpacing();
+            var borderString = _configuration.DisplayColumnBorders ? _configuration.ColumnDividerChar : '\0';
+            var (beforeSpace, afterSpace) = CreateRequiredFillSpacing(columnIndex, data);
+
+            var displayData = $"{borderString}{columnSpacing}{beforeSpace}{data}{afterSpace}{columnSpacing}";
+
+            return isLastValue ? displayData + borderString : displayData;
+
+        }
+
         private string CreateColumnSpacing()
         {
-            return String.Concat(Enumerable.Repeat(" ", _configuration.ColumnSpacing));
+            return String.Concat(Enumerable.Repeat(" ", (int)Math.Ceiling(_configuration.ColumnSpacing / (double)2)));
+        }
+
+        private string CreateRowNumberBuffer()
+        {
+            var bufferSize = _configuration.DisplayRowNumbers ? _numberOfRows.ToString().Length : 0;
+            return String.Concat(Enumerable.Repeat(" ", bufferSize));
         }
 
         private (string, string) CreateRequiredFillSpacing(int columnIndex, string data)
@@ -146,6 +166,16 @@ namespace ConsoleDataVisualiser.Table
             var afterSpace = String.Concat(Enumerable.Repeat(" ", leftoverSpace % 2 == 0 ? (int)numberOfSpaces : (int)numberOfSpaces - 1));
 
             return (beforeSpace, afterSpace);
+        }
+
+        private string CreateHeaderDivider()
+        {
+            var totalColumnDividers = _configuration.DisplayColumnBorders ? Headers.Length + 1 : 0;
+            var rowNumberBuffer = CreateRowNumberBuffer();
+            var lengthOfDivider = _headerTotalLength + (_configuration.ColumnSpacing * Headers.Length) + _configuration.ColumnSpacing + totalColumnDividers;
+
+            var divider = String.Concat(rowNumberBuffer, String.Concat(Enumerable.Repeat(_configuration.HeaderDividerChar, lengthOfDivider)));
+            return divider;
         }
 
         private void UpdateColumnWidthValues(string[] data)
