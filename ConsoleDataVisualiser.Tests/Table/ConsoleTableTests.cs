@@ -60,5 +60,31 @@ namespace ConsoleDataVisualiser.Tests.Table
                     ConsoleTable.Create().WithHeaders(_headers).WithHeaders(_headers); 
                 });
         }
+
+        [Test]
+        public void AddingDataWithDifferentNumberOfColumnsThrowsException()
+        {
+            var rowOne = new string[] { "One", "Two", "Three" };
+            var rowTwo = new string[] { "Four", "Five" };
+
+            Assert.Throws(typeof(Exception),
+                delegate ()
+                {
+                    ConsoleTable.Create().WithData(new List<string[]>() { rowOne, rowTwo });
+                });
+        }
+
+        [Test]
+        public void AddingTwoRowsSeparatelyWithDifferingNumbersOfColumnsThrowsException()
+        {
+            var rowOne = new string[] { "One", "Two", "Three" };
+            var rowTwo = new string[] { "Four", "Five" };
+
+            Assert.Throws(typeof(Exception),
+                delegate ()
+                {
+                    ConsoleTable.Create().AddDataRow(rowOne).AddDataRow( rowTwo);
+                });
+        }
     }
 }

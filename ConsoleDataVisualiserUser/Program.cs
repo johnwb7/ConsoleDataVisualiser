@@ -12,7 +12,8 @@ namespace ConsoleDataVisualiserUser
             var data = new List<string[]>(){ 
                                             new string[] { "Mark Ramprakash", "40", "Some house" }, 
                                             new string[] { "Kumar Sangakkarra", "39", "Another house" }, 
-                                            new string[] { "Moeen Ali", "33", "A house" } };
+                                            new string[] { "Moeen Ali", "33", "A house" },
+            };
 
             var data2 = new List<int[]>()
             {
@@ -25,6 +26,7 @@ namespace ConsoleDataVisualiserUser
                             .WithHeaderDivider()
                             .WithColumnBorders()
                             .WithRowNumbers()
+                            .WithRowBorders()
                             .WithColumnSpacing(5);
 
             ConsoleTable.Create()
@@ -33,7 +35,9 @@ namespace ConsoleDataVisualiserUser
                 .WithConfiguration(config)
                 .PrintTable();
 
-            // To Do: Exception if too many row fields. Move all required tracking stats into one method call. Tests
+            // To Do: Header Spacing. Given number is either side of the data. No div by 2
+            // Interface for table configuration
+            // Test row numbers with double and triple figure number of rows.
         }
     }
 }

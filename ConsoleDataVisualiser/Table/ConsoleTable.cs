@@ -7,11 +7,9 @@ namespace ConsoleDataVisualiser.Table
     public class ConsoleTable
     {
         public string[] Headers { get; private set; } = new string[0];
-        public List<string[]> Data {get; private set; } = new List<string[]>();
+        public List<string[]> Data { get; private set; } = new List<string[]>();
 
-        private int _headerTotalLength { get; set; } = 0;
-        private int _numberOfRows { get; set; } = 0;
-        private Dictionary<int, int> _requiredColumnWidths { get; set; } = new Dictionary<int, int>();
+        private TableMetaData _metaData {get; set;}
         private TableConfiguration _configuration { get; set; } = TableConfiguration.Minimal;
 
         public static ConsoleTable Create()
@@ -20,44 +18,61 @@ namespace ConsoleDataVisualiser.Table
         }
         private ConsoleTable()
         {
-
+            Headers = new string[0];
+            Data = new List<string[]>();
+            _metaData = TableMetaData.Create();
+            _configuration = TableConfiguration.Minimal;
         }
 
         public ConsoleTable WithHeaders(string[] headers)
         {
+            EnsureValidNumberOfColumns(headers.Length);
             if(Headers.Length > 0)
             {
                 throw new Exception("Headers already set. Cannot set headers more than once.");
             }
 
-            _headerTotalLength = headers.Sum(x => x.Length);
-            UpdateMaxColumnWidthValues(headers);
 
+            _metaData.UpdateTableMetaData(headers);
             Headers = headers;
             return this;
         }
 
         public ConsoleTable WithData(List<string[]> data)
         {
-            UpdateMaxColumnWidthValues(data);
-            _numberOfRows += data.Count;
+            data.ForEach(x =>
+            {
+                EnsureValidNumberOfColumns(x.Length);
+                _metaData.UpdateTableMetaData(x);
+            });
+
             Data = data;
             return this;
         }
 
         public ConsoleTable WithData(IRowConvertable[] data)
         {
-            var formattedData = data.Select(obj => obj.MapToRow().ToArray()).ToList();
-            UpdateMaxColumnWidthValues(formattedData);
-            _numberOfRows += data.Length;
+            var formattedData = data.Select(obj =>
+            {
+                var row = obj.MapToRow();
+                EnsureValidNumberOfColumns(row.Length);
+                _metaData.UpdateTableMetaData(row);
+                return row.ToArray();
+            }).ToList();
+            Data = formattedData;
             return this;
         }
 
         public ConsoleTable WithData<T>(IEnumerable<T[]> data)
         {
-            var formattedData = data.Select(row => row.Select(item => item.ToString()).ToArray()).ToList();
-            UpdateMaxColumnWidthValues(formattedData);
-            _numberOfRows += formattedData.Count;
+            var formattedData = data.Select(row =>
+            {
+                var formattedRow = row.Select(x => x.ToString()).ToArray();
+                EnsureValidNumberOfColumns(formattedRow.Length);
+                _metaData.UpdateTableMetaData(formattedRow);
+                return formattedRow;
+            }).ToList();
+  
             Data = formattedData;
             return this;
         }
@@ -65,8 +80,9 @@ namespace ConsoleDataVisualiser.Table
         public ConsoleTable AddDataRow(IRowConvertable obj)
         {
             var row = obj.MapToRow();
-            UpdateMaxColumnWidthValues(row);
-            _numberOfRows += 1;
+            EnsureValidNumberOfColumns(row.Length);
+            _metaData.UpdateTableMetaData(row);
+
             Data.Add(row);
             return this;
         }
@@ -74,8 +90,9 @@ namespace ConsoleDataVisualiser.Table
         public ConsoleTable AddDataRow<T>(T[] row)
         {
             var formattedData = row.Select(x => x.ToString()).ToArray();
-            UpdateMaxColumnWidthValues(formattedData);
-            _numberOfRows += 1;
+            EnsureValidNumberOfColumns(formattedData.Length);
+            _metaData.UpdateTableMetaData(formattedData);
+
             Data.Add(formattedData);
             return this;
         }
@@ -83,8 +100,9 @@ namespace ConsoleDataVisualiser.Table
         public ConsoleTable AddDataRow(object[] row)
         {
             var formattedData = row.Select(x => x.ToString()).ToArray();
-            UpdateMaxColumnWidthValues(formattedData);
-            _numberOfRows += 1;
+            EnsureValidNumberOfColumns(formattedData.Length);
+            _metaData.UpdateTableMetaData(formattedData);
+
             Data.Add(formattedData);
             return this;
         }
@@ -103,6 +121,13 @@ namespace ConsoleDataVisualiser.Table
 
         private void PrintHeaders()
         {
+            // Top Table Border
+            if(_configuration.DisplayRowBorders)
+            {
+                Console.WriteLine(CreateRowBorder());
+            }
+
+            // Headers
             Console.Write(CreateRowNumberBuffer());
             for (var x = 0; x < Headers.Length; x++)
             {
@@ -110,6 +135,7 @@ namespace ConsoleDataVisualiser.Table
             }
             Console.WriteLine();
 
+            // Header Divider
             if (_configuration.DisplayHeaderDivider)
             {
                 Console.WriteLine(CreateHeaderDivider());
@@ -121,21 +147,40 @@ namespace ConsoleDataVisualiser.Table
             for(var y = 0; y < Data.Count; y++)
             {
                 var row = Data[y];
-                var displayRowNumber = _configuration.DisplayRowNumbers ? (y + 1).ToString() : "";
+                var displayRowNumber = _configuration.DisplayRowNumbers ? CreateRowNumber(y + 1) : "";
+
+                // Row Number
                 Console.Write(displayRowNumber);
+                
+                // Data
                 for (var x = 0; x < row.Length; x++)
                 {
                     Console.Write(CreateItemForDisplay(x, row[x], x == row.Length - 1));
                 }
                 Console.WriteLine();
+
+                // Row Border
+                if(_configuration.DisplayRowBorders)
+                {
+                    Console.WriteLine(CreateRowBorder());
+                }
             }
+        }
+
+        private string CreateRowNumber(int number)
+        {
+            var displayNumber = number.ToString();
+            var lengthOfMaxRowNumber = _metaData.NumberOfRows.ToString().Length;
+            var requiredSpacing = lengthOfMaxRowNumber - displayNumber.Length;
+
+            return String.Concat(String.Concat(Enumerable.Repeat(" ", requiredSpacing)), displayNumber);
         }
 
         private string CreateItemForDisplay(int columnIndex, string data, bool isLastValue)
         {
 
             var columnSpacing = CreateColumnSpacing();
-            var borderString = _configuration.DisplayColumnBorders ? _configuration.ColumnDividerChar : '\0';
+            var borderString = _configuration.DisplayColumnBorders ? _configuration.ColumnBorderChar : '\0';
             var (beforeSpace, afterSpace) = CreateRequiredFillSpacing(columnIndex, data);
 
             var displayData = $"{borderString}{columnSpacing}{beforeSpace}{data}{afterSpace}{columnSpacing}";
@@ -151,13 +196,13 @@ namespace ConsoleDataVisualiser.Table
 
         private string CreateRowNumberBuffer()
         {
-            var bufferSize = _configuration.DisplayRowNumbers ? _numberOfRows.ToString().Length : 0;
+            var bufferSize = _configuration.DisplayRowNumbers ? _metaData.NumberOfRows.ToString().Length : 0;
             return String.Concat(Enumerable.Repeat(" ", bufferSize));
         }
 
         private (string, string) CreateRequiredFillSpacing(int columnIndex, string data)
         {
-            var leftoverSpace = _requiredColumnWidths[columnIndex] - data.Length;
+            var leftoverSpace = _metaData.RequiredColumnWidths[columnIndex] - data.Length;
             var numberOfSpaces = Math.Ceiling((double)leftoverSpace / 2);
 
             var beforeSpace = String.Concat(Enumerable.Repeat(" ", (int)numberOfSpaces));
@@ -168,41 +213,39 @@ namespace ConsoleDataVisualiser.Table
 
         private string CreateHeaderDivider()
         {
+            var lengthOfDivider = CalculateLengthofRow();
+            return String.Concat(CreateRowNumberBuffer(), String.Concat(Enumerable.Repeat(_configuration.HeaderDividerChar, lengthOfDivider)));
+        }
+
+        private string CreateRowBorder()
+        {
+            var requiredLength = CalculateLengthofRow();
+            return String.Concat(CreateRowNumberBuffer(), String.Concat(Enumerable.Repeat(_configuration.RowBorderChar, requiredLength)));
+        }
+
+        private int CalculateLengthofRow()
+        {
             var totalColumnDividers = _configuration.DisplayColumnBorders ? Headers.Length + 1 : 0;
-            var maxWidthOfColumns = _requiredColumnWidths.Sum(x => x.Value);
+            var maxWidthOfColumns = _metaData.RequiredColumnWidths.Sum(x => x.Value);
             var totalSpacing = _configuration.ColumnSpacing * Headers.Length;
-            var lengthOfDivider = maxWidthOfColumns + totalSpacing + totalColumnDividers;
 
-            var divider = String.Concat(CreateRowNumberBuffer(), String.Concat(Enumerable.Repeat(_configuration.HeaderDividerChar, lengthOfDivider)));
-            return divider;
+            var length = maxWidthOfColumns + totalSpacing + totalColumnDividers;
+            return length;
         }
 
-        private void UpdateMaxColumnWidthValues(string[] data)
+        public void EnsureValidNumberOfColumns(int numberOfColumns)
         {
-            for(int x = 0; x < data.Length; x ++)
+            if (!IsValidNumberOfColumns(numberOfColumns))
             {
-                if(_requiredColumnWidths.ContainsKey(x))
-                {
-                    if (data[x].Length > _requiredColumnWidths[x])
-                    {
-                        _requiredColumnWidths[x] = data[x].Length;
-                    }
-                }
-                else
-                {
-                    _requiredColumnWidths[x] = data[x].Length;
-                }        
+                throw new Exception($"Row does not fit the required number of columns: {_metaData.NumberOfColumns} " +
+                    $"\n It is likely you have already set headers or a data row with a different length to {numberOfColumns}");
             }
         }
 
-        private void UpdateMaxColumnWidthValues(List<string[]> data)
+        private bool IsValidNumberOfColumns(int number)
         {
-            foreach(var row in data)
-            {
-                UpdateMaxColumnWidthValues(row);
-            }
+            return _metaData.NumberOfColumns == 0 ? true : number == _metaData.NumberOfColumns;
         }
-
 
     }
 }
