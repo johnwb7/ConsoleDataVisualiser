@@ -32,6 +32,8 @@ namespace ConsoleDataVisualiserUser
                 .WithData(data)
                 .WithConfiguration(config)
                 .PrintTable();
+
+            // To Do: Exception if too many row fields. Move all required tracking stats into one method call. Tests
         }
     }
 }

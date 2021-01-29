@@ -6,13 +6,13 @@ namespace ConsoleDataVisualiser.Table
 {
     public class ConsoleTable
     {
-        public string[] Headers { get; private set; }
-        public List<string[]> Data {get; private set; }
+        public string[] Headers { get; private set; } = new string[0];
+        public List<string[]> Data {get; private set; } = new List<string[]>();
 
-        private int _headerTotalLength { get; set; }
+        private int _headerTotalLength { get; set; } = 0;
         private int _numberOfRows { get; set; } = 0;
-        private Dictionary<int, int> _requiredColumnWidths { get; set; }
-        private TableConfiguration _configuration { get; set; }
+        private Dictionary<int, int> _requiredColumnWidths { get; set; } = new Dictionary<int, int>();
+        private TableConfiguration _configuration { get; set; } = TableConfiguration.Minimal;
 
         public static ConsoleTable Create()
         {
@@ -20,10 +20,7 @@ namespace ConsoleDataVisualiser.Table
         }
         private ConsoleTable()
         {
-            Headers = new string[0];
-            Data = new List<string[]>();
-            _requiredColumnWidths = new Dictionary<int, int>();
-            _configuration = TableConfiguration.Default;
+
         }
 
         public ConsoleTable WithHeaders(string[] headers)
@@ -65,14 +62,6 @@ namespace ConsoleDataVisualiser.Table
             return this;
         }
 
-        public ConsoleTable AddDataRow(string[] row)
-        {
-            UpdateMaxColumnWidthValues(row);
-            _numberOfRows += 1;
-            Data.Add(row);
-            return this;
-        }
-
         public ConsoleTable AddDataRow(IRowConvertable obj)
         {
             var row = obj.MapToRow();
@@ -83,6 +72,15 @@ namespace ConsoleDataVisualiser.Table
         }
 
         public ConsoleTable AddDataRow<T>(T[] row)
+        {
+            var formattedData = row.Select(x => x.ToString()).ToArray();
+            UpdateMaxColumnWidthValues(formattedData);
+            _numberOfRows += 1;
+            Data.Add(formattedData);
+            return this;
+        }
+
+        public ConsoleTable AddDataRow(object[] row)
         {
             var formattedData = row.Select(x => x.ToString()).ToArray();
             UpdateMaxColumnWidthValues(formattedData);

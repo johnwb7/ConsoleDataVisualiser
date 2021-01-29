@@ -17,7 +17,7 @@ namespace ConsoleDataVisualiser.Tests.Table
             var testRow = new int[] { 1, 2, 3 };
             var expectedRow = new string[] { "1", "2", "3" };
 
-            var table = ConsoleTable.Create().AddDataRow<int>(testRow);
+            var table = ConsoleTable.Create().AddDataRow(testRow);
             var lastRow = table.Data.Last();
 
             Assert.That(lastRow, Is.EqualTo(expectedRow));
@@ -32,6 +32,12 @@ namespace ConsoleDataVisualiser.Tests.Table
             var lastRow = table.Data.Last();
 
             Assert.That(lastRow, Is.EqualTo(testRow));
+        }
+
+        [Test]
+        public void AddRow_WhereRowIsObjectArrayAddsSuccessfully()
+        {
+
         }
 
         [Test]
