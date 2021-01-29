@@ -34,7 +34,7 @@ namespace ConsoleDataVisualiser.Table
             }
 
             _headerTotalLength = headers.Sum(x => x.Length);
-            UpdateColumnWidthValues(headers);
+            UpdateMaxColumnWidthValues(headers);
 
             Headers = headers;
             return this;
@@ -42,7 +42,7 @@ namespace ConsoleDataVisualiser.Table
 
         public ConsoleTable WithData(List<string[]> data)
         {
-            UpdateColumnWidthValues(data);
+            UpdateMaxColumnWidthValues(data);
             _numberOfRows += data.Count;
             Data = data;
             return this;
@@ -51,7 +51,7 @@ namespace ConsoleDataVisualiser.Table
         public ConsoleTable WithData(IRowConvertable[] data)
         {
             var formattedData = data.Select(obj => obj.MapToRow().ToArray()).ToList();
-            UpdateColumnWidthValues(formattedData);
+            UpdateMaxColumnWidthValues(formattedData);
             _numberOfRows += data.Length;
             return this;
         }
@@ -59,7 +59,7 @@ namespace ConsoleDataVisualiser.Table
         public ConsoleTable WithData<T>(IEnumerable<T[]> data)
         {
             var formattedData = data.Select(row => row.Select(item => item.ToString()).ToArray()).ToList();
-            UpdateColumnWidthValues(formattedData);
+            UpdateMaxColumnWidthValues(formattedData);
             _numberOfRows += formattedData.Count;
             Data = formattedData;
             return this;
@@ -67,7 +67,7 @@ namespace ConsoleDataVisualiser.Table
 
         public ConsoleTable AddDataRow(string[] row)
         {
-            UpdateColumnWidthValues(row);
+            UpdateMaxColumnWidthValues(row);
             _numberOfRows += 1;
             Data.Add(row);
             return this;
@@ -76,7 +76,7 @@ namespace ConsoleDataVisualiser.Table
         public ConsoleTable AddDataRow(IRowConvertable obj)
         {
             var row = obj.MapToRow();
-            UpdateColumnWidthValues(row);
+            UpdateMaxColumnWidthValues(row);
             _numberOfRows += 1;
             Data.Add(row);
             return this;
@@ -85,7 +85,7 @@ namespace ConsoleDataVisualiser.Table
         public ConsoleTable AddDataRow<T>(T[] row)
         {
             var formattedData = row.Select(x => x.ToString()).ToArray();
-            UpdateColumnWidthValues(formattedData);
+            UpdateMaxColumnWidthValues(formattedData);
             _numberOfRows += 1;
             Data.Add(formattedData);
             return this;
@@ -171,14 +171,15 @@ namespace ConsoleDataVisualiser.Table
         private string CreateHeaderDivider()
         {
             var totalColumnDividers = _configuration.DisplayColumnBorders ? Headers.Length + 1 : 0;
-            var rowNumberBuffer = CreateRowNumberBuffer();
-            var lengthOfDivider = _headerTotalLength + (_configuration.ColumnSpacing * Headers.Length) + _configuration.ColumnSpacing + totalColumnDividers;
+            var maxWidthOfColumns = _requiredColumnWidths.Sum(x => x.Value);
+            var totalSpacing = _configuration.ColumnSpacing * Headers.Length;
+            var lengthOfDivider = maxWidthOfColumns + totalSpacing + totalColumnDividers;
 
-            var divider = String.Concat(rowNumberBuffer, String.Concat(Enumerable.Repeat(_configuration.HeaderDividerChar, lengthOfDivider)));
+            var divider = String.Concat(CreateRowNumberBuffer(), String.Concat(Enumerable.Repeat(_configuration.HeaderDividerChar, lengthOfDivider)));
             return divider;
         }
 
-        private void UpdateColumnWidthValues(string[] data)
+        private void UpdateMaxColumnWidthValues(string[] data)
         {
             for(int x = 0; x < data.Length; x ++)
             {
@@ -196,11 +197,11 @@ namespace ConsoleDataVisualiser.Table
             }
         }
 
-        private void UpdateColumnWidthValues(List<string[]> data)
+        private void UpdateMaxColumnWidthValues(List<string[]> data)
         {
             foreach(var row in data)
             {
-                UpdateColumnWidthValues(row);
+                UpdateMaxColumnWidthValues(row);
             }
         }
 

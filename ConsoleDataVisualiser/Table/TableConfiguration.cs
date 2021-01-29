@@ -25,29 +25,29 @@ namespace ConsoleDataVisualiser.Table
             return new TableConfiguration();
         }
 
-        public TableConfiguration WithRowNumbers(bool displayRowNumbers)
+        public TableConfiguration WithRowNumbers()
         {
-            DisplayRowNumbers = displayRowNumbers;
+            DisplayRowNumbers = true;
             return this;
         }
 
-        public TableConfiguration WithColumnBorders(bool displayColumnBorders, char dividerSymbol = '|')
+        public TableConfiguration WithColumnBorders(char dividerSymbol = '|')
         {
             ColumnDividerChar = dividerSymbol;
-            DisplayColumnBorders = displayColumnBorders;
+            DisplayColumnBorders = true;
             return this;
         }
 
-        public TableConfiguration WithHeaderDivider(bool displayHeaderDivider, char dividerSymbol = '-')
+        public TableConfiguration WithHeaderDivider(char dividerSymbol = '-')
         {
             HeaderDividerChar = dividerSymbol;
-            DisplayHeaderDivider = displayHeaderDivider;
+            DisplayHeaderDivider = true;
             return this;
         }
 
         public TableConfiguration WithColumnSpacing(int columnSpacing)
         {
-            ColumnSpacing = columnSpacing;
+            ColumnSpacing = columnSpacing % 2 == 0 ? columnSpacing : columnSpacing + 1;
             return this;
         }
     }
