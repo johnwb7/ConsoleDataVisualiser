@@ -57,5 +57,29 @@ The row in the table will show as: | One | Two | 3 |
 
 
 ## TableConfiguration
+The Configuration of the table can be defined by the user. All customisable options have default options, so users only need to call the following methods on desired customisable options. A configuration can be created by calling the static `TableConfiguration.Create()` method. Configuration can then be specfiied by chained method calls. 
 
+`WithRowNumbers()`
+Configures the table to display row numbers at the beginning of each row
+
+`WithColumnBorders()`
+Configures the table to display borders between the columns. The border character can optionally be defined also (`WithColumnBorders(char borderSymbol)`). The default border character is `|`
+
+`WithRowBorders()`
+Configures the table to display borders between each row. The border character can optionally be defined also (`WithRowBorders(char borderSymbol)`). The default border character is `-`
+
+`WithHeaderDivider()`
+Configures the table to show a divider between the headers and the data. The The divider character can optionally be defined also (`WithHeaderDivider(char dividerSymbol)`). The default divider character is `-`.
+
+`WithColumnSpacing(int columnSpacing)`
+Defines the amount of padding to provide in each column. An odd number is rounded up to the next even number.
+
+`SortByColumnIndex(int index, SortBy sortBy)`
+A user can define if they want the table sorted by specific column values, and in ascending or descending order by rhe `SortBy` enum. By default, the rows are unsorted and display in the order they were added.
+
+#### Pre-defined Configurations
+The following pre defined confiogurations are available by static methods on the `TableConfiguration` class:
+
+- `Minimal`
+- `Fancy`
 
