@@ -35,9 +35,6 @@ namespace ConsoleDataVisualiserUser
                 .WithConfiguration(config)
                 .PrintTable();
 
-            // To Do: Header Spacing. Given number is either side of the data. No div by 2
-            // Interface for table configuration
-            // Test row numbers with double and triple figure number of rows.
         }
     }
 }
