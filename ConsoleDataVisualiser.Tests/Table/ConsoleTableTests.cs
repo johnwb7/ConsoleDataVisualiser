@@ -4,6 +4,7 @@ using System.Text;
 using NUnit.Framework;
 using ConsoleDataVisualiser.Table;
 using System.Linq;
+using ConsoleDataVisualiser.Table.Configuration;
 
 namespace ConsoleDataVisualiser.Tests.Table
 {
@@ -84,6 +85,86 @@ namespace ConsoleDataVisualiser.Tests.Table
                 delegate ()
                 {
                     ConsoleTable.Create().AddDataRow(rowOne).AddDataRow( rowTwo);
+                });
+        }
+
+        [Test]
+        public void SortByAscendingSortsCorrectly()
+        {
+            var rowOne = new string[] { "2", "Word", "Three" };
+            var rowTwo = new string[] { "3", "Blah", "String" };
+            var rowThree = new string[] { "1", "Earth", "Genau" };
+
+            var data = new List<string[]>() { rowOne, rowTwo, rowThree };
+            var expectedData = new List<string[]>() { rowThree, rowOne, rowTwo };
+
+            var config = TableConfiguration.Create().SortByColumnIndex(0, SortBy.Ascending);
+
+            var table = ConsoleTable.Create()
+                            .WithData(data)
+                            .WithConfiguration(config);
+
+            table.PrintTable();
+            Assert.That(table.Data, Is.EqualTo(expectedData));
+        }
+
+        [Test]
+        public void SortByDescendingSortsCorrectly()
+        {
+            var rowOne = new string[] { "2", "Word", "Three" };
+            var rowTwo = new string[] { "3", "Blah", "String" };
+            var rowThree = new string[] { "1", "Earth", "Genau" };
+
+            var data = new List<string[]>() { rowOne, rowTwo, rowThree };
+            var expectedData = new List<string[]>() { rowTwo, rowOne, rowThree};
+
+            var config = TableConfiguration.Create().SortByColumnIndex(0, SortBy.Descending);
+
+            var table = ConsoleTable.Create()
+                            .WithData(data)
+                            .WithConfiguration(config);
+
+            table.PrintTable();
+            Assert.That(table.Data, Is.EqualTo(expectedData));
+        }
+
+        [Test]
+        public void NoSortByDoesNotSortData()
+        {
+            var rowOne = new string[] { "1", "Word", "Three" };
+            var rowTwo = new string[] { "3", "Blah", "String" };
+            var rowThree = new string[] { "2", "Earth", "Genau" };
+
+            var data = new List<string[]>() { rowOne, rowTwo, rowThree };
+
+            var config = TableConfiguration.Create();
+
+            var table = ConsoleTable.Create()
+                            .WithData(data)
+                            .WithConfiguration(config);
+            
+            table.PrintTable();
+            Assert.That(table.Data, Is.EqualTo(data));
+        }
+
+        [Test]
+        public void SortByInvalidColumnIndexThrowsException()
+        {
+            var rowOne = new string[] { "1", "Word", "Three" };
+            var rowTwo = new string[] { "3", "Blah", "String" };
+            var rowThree = new string[] { "2", "Earth", "Genau" };
+
+            var data = new List<string[]>() { rowOne, rowTwo, rowThree };
+
+            var config = TableConfiguration.Create().SortByColumnIndex(3, SortBy.Ascending);
+
+            Assert.Throws(typeof(Exception),
+                delegate ()
+                {
+                    ConsoleTable.Create()
+                    .WithData(data)
+                    .WithConfiguration(config)
+                    .PrintTable();
                 });
         }
     }

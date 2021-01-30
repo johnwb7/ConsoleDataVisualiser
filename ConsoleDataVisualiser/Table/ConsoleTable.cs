@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConsoleDataVisualiser.Table.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,8 +10,9 @@ namespace ConsoleDataVisualiser.Table
         public string[] Headers { get; private set; } = new string[0];
         public List<string[]> Data { get; private set; } = new List<string[]>();
 
+        public TableConfiguration Configuration { get; private set; } = TableConfiguration.Minimal;
         private TableMetaData _metaData {get; set;}
-        private TableConfiguration _configuration { get; set; } = TableConfiguration.Minimal;
+
 
         public static ConsoleTable Create()
         {
@@ -21,7 +23,7 @@ namespace ConsoleDataVisualiser.Table
             Headers = new string[0];
             Data = new List<string[]>();
             _metaData = TableMetaData.Create();
-            _configuration = TableConfiguration.Minimal;
+            Configuration = TableConfiguration.Minimal;
         }
 
         public ConsoleTable WithHeaders(string[] headers)
@@ -63,7 +65,7 @@ namespace ConsoleDataVisualiser.Table
             return this;
         }
 
-        public ConsoleTable WithData<T>(IEnumerable<T[]> data)
+        public ConsoleTable WithData(IEnumerable<object[]> data)
         {
             var formattedData = data.Select(row =>
             {
@@ -74,6 +76,29 @@ namespace ConsoleDataVisualiser.Table
             }).ToList();
   
             Data = formattedData;
+            return this;
+        }
+
+        public ConsoleTable WithData<T>(IEnumerable<T[]> data)
+        {
+            var formattedData = data.Select(row =>
+            {
+                var formattedRow = row.Select(x => x.ToString()).ToArray();
+                EnsureValidNumberOfColumns(formattedRow.Length);
+                _metaData.UpdateTableMetaData(formattedRow);
+                return formattedRow;
+            }).ToList();
+
+            Data = formattedData;
+            return this;
+        }
+
+        public ConsoleTable AddDataRow(string[] row)
+        {
+            EnsureValidNumberOfColumns(row.Length);
+            _metaData.UpdateTableMetaData(row);
+
+            Data.Add(row);
             return this;
         }
 
@@ -109,12 +134,13 @@ namespace ConsoleDataVisualiser.Table
 
         public ConsoleTable WithConfiguration(TableConfiguration config)
         {
-            _configuration = config;
+            Configuration = config;
             return this;
         }
 
         public void PrintTable()
         {
+            SortData();
             PrintHeaders();
             PrintData();
         }
@@ -122,7 +148,7 @@ namespace ConsoleDataVisualiser.Table
         private void PrintHeaders()
         {
             // Top Table Border
-            if(_configuration.DisplayRowBorders)
+            if(Configuration.DisplayRowBorders)
             {
                 Console.WriteLine(CreateRowBorder());
             }
@@ -136,7 +162,7 @@ namespace ConsoleDataVisualiser.Table
             Console.WriteLine();
 
             // Header Divider
-            if (_configuration.DisplayHeaderDivider)
+            if (Configuration.DisplayHeaderDivider)
             {
                 Console.WriteLine(CreateHeaderDivider());
             }     
@@ -147,7 +173,7 @@ namespace ConsoleDataVisualiser.Table
             for(var y = 0; y < Data.Count; y++)
             {
                 var row = Data[y];
-                var displayRowNumber = _configuration.DisplayRowNumbers ? CreateRowNumber(y + 1) : "";
+                var displayRowNumber = Configuration.DisplayRowNumbers ? CreateRowNumber(y + 1) : "";
 
                 // Row Number
                 Console.Write(displayRowNumber);
@@ -160,7 +186,7 @@ namespace ConsoleDataVisualiser.Table
                 Console.WriteLine();
 
                 // Row Border
-                if(_configuration.DisplayRowBorders)
+                if(Configuration.DisplayRowBorders)
                 {
                     Console.WriteLine(CreateRowBorder());
                 }
@@ -180,7 +206,7 @@ namespace ConsoleDataVisualiser.Table
         {
 
             var columnSpacing = CreateColumnSpacing();
-            var borderString = _configuration.DisplayColumnBorders ? _configuration.ColumnBorderChar : '\0';
+            var borderString = Configuration.DisplayColumnBorders ? Configuration.ColumnBorderChar : '\0';
             var (beforeSpace, afterSpace) = CreateRequiredFillSpacing(columnIndex, data);
 
             var displayData = $"{borderString}{columnSpacing}{beforeSpace}{data}{afterSpace}{columnSpacing}";
@@ -191,12 +217,12 @@ namespace ConsoleDataVisualiser.Table
 
         private string CreateColumnSpacing()
         {
-            return String.Concat(Enumerable.Repeat(" ", (int)Math.Ceiling(_configuration.ColumnSpacing / (double)2)));
+            return String.Concat(Enumerable.Repeat(" ", (int)Math.Ceiling(Configuration.ColumnSpacing / (double)2)));
         }
 
         private string CreateRowNumberBuffer()
         {
-            var bufferSize = _configuration.DisplayRowNumbers ? _metaData.NumberOfRows.ToString().Length : 0;
+            var bufferSize = Configuration.DisplayRowNumbers ? _metaData.NumberOfRows.ToString().Length : 0;
             return String.Concat(Enumerable.Repeat(" ", bufferSize));
         }
 
@@ -214,20 +240,20 @@ namespace ConsoleDataVisualiser.Table
         private string CreateHeaderDivider()
         {
             var lengthOfDivider = CalculateLengthofRow();
-            return String.Concat(CreateRowNumberBuffer(), String.Concat(Enumerable.Repeat(_configuration.HeaderDividerChar, lengthOfDivider)));
+            return String.Concat(CreateRowNumberBuffer(), String.Concat(Enumerable.Repeat(Configuration.HeaderDividerChar, lengthOfDivider)));
         }
 
         private string CreateRowBorder()
         {
             var requiredLength = CalculateLengthofRow();
-            return String.Concat(CreateRowNumberBuffer(), String.Concat(Enumerable.Repeat(_configuration.RowBorderChar, requiredLength)));
+            return String.Concat(CreateRowNumberBuffer(), String.Concat(Enumerable.Repeat(Configuration.RowBorderChar, requiredLength)));
         }
 
         private int CalculateLengthofRow()
         {
-            var totalColumnDividers = _configuration.DisplayColumnBorders ? Headers.Length + 1 : 0;
+            var totalColumnDividers = Configuration.DisplayColumnBorders ? Headers.Length + 1 : 0;
             var maxWidthOfColumns = _metaData.RequiredColumnWidths.Sum(x => x.Value);
-            var totalSpacing = _configuration.ColumnSpacing * Headers.Length;
+            var totalSpacing = Configuration.ColumnSpacing * Headers.Length;
 
             var length = maxWidthOfColumns + totalSpacing + totalColumnDividers;
             return length;
@@ -245,6 +271,24 @@ namespace ConsoleDataVisualiser.Table
         private bool IsValidNumberOfColumns(int number)
         {
             return _metaData.NumberOfColumns == 0 ? true : number == _metaData.NumberOfColumns;
+        }
+
+        private void SortData()
+        {
+            if (Configuration.SortByMethod == SortBy.None)
+            {
+                return;
+            }
+
+            var sortByIndex = Configuration.ColumnSortByIndex;
+            if(sortByIndex > _metaData.NumberOfColumns - 1)
+            {
+                throw new Exception("Invalid Sort By Index");
+            }
+
+            Data = Configuration.SortByMethod == SortBy.Ascending ?
+                Data.OrderBy(x => x[sortByIndex]).ToList() :
+                Data.OrderByDescending(x => x[sortByIndex]).ToList();
         }
 
     }

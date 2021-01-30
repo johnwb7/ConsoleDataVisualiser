@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ConsoleDataVisualiser.Table;
+using ConsoleDataVisualiser.Table.Configuration;
 
 namespace ConsoleDataVisualiserUser
 {
@@ -34,6 +35,8 @@ namespace ConsoleDataVisualiserUser
                 .WithData(data)
                 .WithConfiguration(config)
                 .PrintTable();
+
+           // Sort By Column Index
 
         }
     }

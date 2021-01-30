@@ -1,23 +1,38 @@
-﻿using System;
+﻿using ConsoleDataVisualiser.Table.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ConsoleDataVisualiser.Table
+namespace ConsoleDataVisualiser.Table.Configuration
 {
     public class TableConfiguration
     {
-        internal bool DisplayRowNumbers { get; private set; } = false;
-        internal bool DisplayColumnBorders { get; private set; } = false;
-        internal bool DisplayRowBorders { get; private set; } = false;
-        internal bool DisplayHeaderDivider { get; private set; } = true;
-        internal int ColumnSpacing { get; private set; } = 2;
+        internal bool DisplayRowNumbers { get; private set; }
+        internal bool DisplayColumnBorders { get; private set; }
+        internal bool DisplayRowBorders { get; private set; }
+        internal bool DisplayHeaderDivider { get; private set; }
+        internal int ColumnSpacing { get; private set; }
 
-        internal char HeaderDividerChar { get; private set; } = '-';
-        internal char ColumnBorderChar { get; private set; } = '|';
-        internal char RowBorderChar { get; private set; } = '-';
+        internal char HeaderDividerChar { get; private set; }
+        internal char ColumnBorderChar { get; private set; }
+        internal char RowBorderChar { get; private set; }
+        internal int ColumnSortByIndex { get; private set; }
+        internal SortBy SortByMethod { get; private set; } 
 
         public TableConfiguration()
         {
+            DisplayRowNumbers = false;
+            DisplayColumnBorders = false;
+            DisplayRowNumbers = false;
+            DisplayHeaderDivider = false;
+            ColumnSpacing = 2;
+
+            HeaderDividerChar = '-';
+            ColumnBorderChar = '|';
+            RowBorderChar = '-';
+
+            ColumnSortByIndex = 0;
+            SortByMethod = SortBy.None;
 
         }
 
@@ -32,6 +47,9 @@ namespace ConsoleDataVisualiser.Table
             HeaderDividerChar = headerDividerChar;
             ColumnBorderChar = ColumnBorderChar;
             RowBorderChar = rowBorderChar;
+
+            ColumnSortByIndex = 0;
+            SortByMethod = SortBy.None;
         }
 
         public static TableConfiguration Minimal => new TableConfiguration(false, false, false, true, 2, '-', '|', '-');
@@ -72,6 +90,13 @@ namespace ConsoleDataVisualiser.Table
         public TableConfiguration WithColumnSpacing(int columnSpacing)
         {
             ColumnSpacing = columnSpacing % 2 == 0 ? columnSpacing : columnSpacing + 1;
+            return this;
+        }
+
+        public TableConfiguration SortByColumnIndex(int index, SortBy sortBy)
+        {
+            ColumnSortByIndex = index;
+            SortByMethod = sortBy;
             return this;
         }
     }
