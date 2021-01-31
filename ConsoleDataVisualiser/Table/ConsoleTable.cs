@@ -7,10 +7,10 @@ namespace ConsoleDataVisualiser.Table
 {
     public class ConsoleTable
     {
-        public string[] Headers { get; private set; } = new string[0];
-        public List<string[]> Data { get; private set; } = new List<string[]>();
+        public string[] Headers { get; private set; }
+        public List<string[]> Data { get; private set; }
 
-        public TableConfiguration Configuration { get; private set; } = TableConfiguration.Minimal;
+        public TableConfiguration Configuration { get; private set; }
         private TableMetaData _metaData {get; set;}
 
 
