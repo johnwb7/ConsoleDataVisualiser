@@ -74,9 +74,6 @@ Configures the table to show a divider between the headers and the data. The The
 `WithColumnSpacing(int columnSpacing)`
 Defines the amount of padding to provide in each column. An odd number is rounded up to the next even number.
 
-`SortByColumnIndex(int index, SortBy sortBy)`
-A user can define if they want the table sorted by specific column values, and in ascending or descending order by rhe `SortBy` enum. Indexing starts at 0. By default, the rows are unsorted and display in the order they were added.
-
 #### Pre-defined Configurations
 The following pre defined confiogurations are available by static methods on the `TableConfiguration` class:
 
