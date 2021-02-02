@@ -42,7 +42,6 @@ namespace ConsoleDataVisualiser.Table.Configuration
             HeaderDividerChar = headerDividerChar;
             ColumnBorderChar = columnBorderChar;
             RowBorderChar = rowBorderChar;
-
         }
 
         public static TableConfiguration Minimal => new TableConfiguration(false, false, false, true, 2, '-', '|', '-');

@@ -283,23 +283,5 @@ namespace ConsoleDataVisualiser.Table
         {
             return _metaData.NumberOfColumns == 0 ? true : number == _metaData.NumberOfColumns;
         }
-
-        private void SortData()
-        {
-            if (Configuration.SortByMethod == SortBy.None)
-            {
-                return;
-            }
-
-            var sortByIndex = Configuration.ColumnSortByIndex;
-            if(sortByIndex > _metaData.NumberOfColumns - 1)
-            {
-                throw new Exception("Invalid Sort By Index");
-            }
-
-            Data = Configuration.SortByMethod == SortBy.Ascending ?
-                Data.OrderBy(x => x[sortByIndex]).ToList() :
-                Data.OrderByDescending(x => x[sortByIndex]).ToList();
-        }
     }
 }

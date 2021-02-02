@@ -17,16 +17,18 @@ namespace ConsoleDataVisualiserUser
                                             new string[] { "Moeen Ali", "33", "A house" },
             };
 
-            var data2 = new List<int[]>()
+            var data2 = new List<object[]>()
             {
-                new int[] {111, 222, 333 },
-                new int[] {444, 555, 6666 },
-                new int[] {777, 888, 999 }
+                new object[] {111, "Hi", 12.00},
+                new object[] {444, 555, 6666 },
+                new object[] {777, 888, 999 }
             };
 
             var myObjOne = new MyObject(1, 2, 3);
             var myObjTwo = new MyObject(4, 5, 6);
             var myObjThree = new MyObject(7, 8, 9);
+
+            var objectt = new object[] { "12", 12, 12.00 };
 
             var objectData = new IRowConvertable[] { myObjOne, myObjThree, myObjTwo };
 
@@ -34,11 +36,12 @@ namespace ConsoleDataVisualiserUser
                             .WithHeaderDivider('*')
                             .WithColumnBorders()
                             .WithRowNumbers()
+                            .WithRowBorders()
                             .WithColumnSpacing(20);
 
             ConsoleTable.Create()
                 .WithHeaders(headers)
-                .WithData(objectData)
+                .WithData(data2)
                 .AddDataRow(myObjTwo)
                 .AddDataRow<int>(new int[] { 1, 2, 500000001})
                 .AddDataRow<int>(new int[] { 1, 2, 500000000 })
@@ -50,6 +53,7 @@ namespace ConsoleDataVisualiserUser
                 .AddDataRow<int>(new int[] { 1, 2, 500000345 })
                 .AddDataRow<int>(new int[] { 1, 2, 500000000 })
                 .AddDataRow<int>(new int[] { 1, 2, 500000000 })
+                .AddDataRow(objectt)
                 .WithConfiguration(config)
                 .PrintTable();
 
