@@ -16,8 +16,6 @@ namespace ConsoleDataVisualiser.Table.Configuration
         internal char HeaderDividerChar { get; private set; }
         internal char ColumnBorderChar { get; private set; }
         internal char RowBorderChar { get; private set; }
-        internal int ColumnSortByIndex { get; private set; }
-        internal SortBy SortByMethod { get; private set; } 
 
         public TableConfiguration()
         {
@@ -31,9 +29,6 @@ namespace ConsoleDataVisualiser.Table.Configuration
             ColumnBorderChar = '|';
             RowBorderChar = '-';
 
-            ColumnSortByIndex = 0;
-            SortByMethod = SortBy.None;
-
         }
 
         private TableConfiguration(bool displayRowNumbers, bool displayColumnBorders, bool displayRowBorders, bool displayHeaderDivider, int columnSpacing, char headerDividerChar, char columnBorderChar, char rowBorderChar)
@@ -45,11 +40,9 @@ namespace ConsoleDataVisualiser.Table.Configuration
             ColumnSpacing = columnSpacing;
 
             HeaderDividerChar = headerDividerChar;
-            ColumnBorderChar = ColumnBorderChar;
+            ColumnBorderChar = columnBorderChar;
             RowBorderChar = rowBorderChar;
 
-            ColumnSortByIndex = 0;
-            SortByMethod = SortBy.None;
         }
 
         public static TableConfiguration Minimal => new TableConfiguration(false, false, false, true, 2, '-', '|', '-');
@@ -90,13 +83,6 @@ namespace ConsoleDataVisualiser.Table.Configuration
         public TableConfiguration WithColumnSpacing(int columnSpacing)
         {
             ColumnSpacing = columnSpacing % 2 == 0 ? columnSpacing : columnSpacing + 1;
-            return this;
-        }
-
-        public TableConfiguration SortByColumnIndex(int index, SortBy sortBy)
-        {
-            ColumnSortByIndex = index;
-            SortByMethod = sortBy;
             return this;
         }
     }

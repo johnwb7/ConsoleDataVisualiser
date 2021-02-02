@@ -31,15 +31,25 @@ namespace ConsoleDataVisualiserUser
             var objectData = new IRowConvertable[] { myObjOne, myObjThree, myObjTwo };
 
             var config = TableConfiguration.Create()
-                            .WithHeaderDivider()
+                            .WithHeaderDivider('*')
                             .WithColumnBorders()
                             .WithRowNumbers()
-                            .WithRowBorders()
-                            .WithColumnSpacing(5);
+                            .WithColumnSpacing(20);
 
             ConsoleTable.Create()
                 .WithHeaders(headers)
                 .WithData(objectData)
+                .AddDataRow(myObjTwo)
+                .AddDataRow<int>(new int[] { 1, 2, 500000001})
+                .AddDataRow<int>(new int[] { 1, 2, 500000000 })
+                .AddDataRow<int>(new int[] { 1, 2, 500000000 })
+                .AddDataRow<int>(new int[] { 1, 2, 500000003 })
+                .AddDataRow<int>(new int[] { 1, 2, 500000000 })
+                .AddDataRow<int>(new int[] { 1, 2, 500003465 })
+                .AddDataRow<int>(new int[] { 1, 2, 500006456 })
+                .AddDataRow<int>(new int[] { 1, 2, 500000345 })
+                .AddDataRow<int>(new int[] { 1, 2, 500000000 })
+                .AddDataRow<int>(new int[] { 1, 2, 500000000 })
                 .WithConfiguration(config)
                 .PrintTable();
 

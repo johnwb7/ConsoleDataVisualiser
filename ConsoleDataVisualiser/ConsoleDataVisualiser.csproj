@@ -2,6 +2,23 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Johnwb7</Authors>
+    <Description>A package for displaying data in a configurables and formatted manner in the console. It includes options for working with: 
+- Tables</Description>
+    <PackageProjectUrl>https://github.com/johnwb7/ConsoleDataVisualiser</PackageProjectUrl>
+    <PackageLicenseFile></PackageLicenseFile>
+    <PackageIcon>icons8-sunset-64.png</PackageIcon>
+    <RepositoryUrl>https://github.com/johnwb7/ConsoleDataVisualiser</RepositoryUrl>
+    <PackageTags>data, console, visualise, table, print</PackageTags>
+    <NeutralLanguage></NeutralLanguage>
+    <Company />
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\..\Downloads\icons8-sunset-64.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
