@@ -37,7 +37,7 @@ namespace ConsoleDataVisualiserUser
                             .WithColumnBorders()
                             .WithRowNumbers()
                             .WithRowBorders()
-                            .WithColumnSpacing(20);
+                            .WithColumnSpacing(9);
 
             ConsoleTable.Create()
                 .WithHeaders(headers)
