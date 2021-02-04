@@ -33,7 +33,7 @@ namespace ConsoleDataVisualiserUser
             var objectData = new IRowConvertable[] { myObjOne, myObjThree, myObjTwo };
 
             var config = TableConfiguration.Create()
-                            .WithHeaderDivider('*')
+                            .WithHeaderDivider()
                             .WithColumnBorders()
                             .WithRowNumbers()
                             .WithRowBorders()
@@ -43,7 +43,7 @@ namespace ConsoleDataVisualiserUser
                 .WithHeaders(headers)
                 .WithData(data2)
                 .AddDataRow(myObjTwo)
-                .AddDataRow<int>(new int[] { 1, 2, 500000001})
+                .AddDataRow<int>(new int[] { 1, 2, 500000001, 4})
                 .AddDataRow<int>(new int[] { 1, 2, 500000000 })
                 .AddDataRow<int>(new int[] { 1, 2, 500000000 })
                 .AddDataRow<int>(new int[] { 1, 2, 500000003 })
